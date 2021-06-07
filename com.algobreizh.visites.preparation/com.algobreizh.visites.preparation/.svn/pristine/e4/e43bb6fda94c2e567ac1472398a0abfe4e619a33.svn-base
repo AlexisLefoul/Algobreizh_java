@@ -1,0 +1,134 @@
+package com.algobreizh.visites.preparation.swing;
+
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
+
+import com.algobreizh.visites.preparation.core.lib.Client;
+import com.algobreizh.visites.preparation.core.lib.Outils;
+import com.algobreizh.visites.preparation.data.BddClients;
+import com.algobreizh.visites.preparation.data.Config;
+
+public class Application {
+
+	public static void main(String[] args) throws IOException {
+
+		final JFrame frame = new JFrame("Algobreizh Visites 0.3.3");
+		final JButton btnLogin = new JButton("Connection");
+
+		btnLogin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				IdentificationSwing loginDlg = new IdentificationSwing(frame);
+				loginDlg.setVisible(true);
+				// if logon successfully
+				if (loginDlg.isSucceeded()) {
+					btnLogin.setText("Hi " + loginDlg.getUsername() + "!");
+				}
+			}
+		});
+		
+		//logo
+		BufferedImage myPicture;
+		
+			try {
+				myPicture = ImageIO.read(new File("donnees/img/AlgoBreizh_Logo.png"));
+				JLabel picLabel = new JLabel(new ImageIcon(myPicture));
+				frame.add(picLabel);
+				
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+		//placement de JFrame
+		
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		int height = screenSize.height;
+		int width = screenSize.width;
+		frame.setSize(width/2, height/2);
+
+		frame.setLocationRelativeTo(null);
+
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		//frame.setSize(300, 100);
+		frame.setLayout(new FlowLayout());
+		frame.getContentPane().add(btnLogin);
+		frame.setVisible(true);
+		
+		/* Test de passsord to Hash */
+		System.out.println(Outils.PasswordToHash("Test"));
+
+		/*Appel de la fonction générant la collection de clients */
+		Collection<Client> clients = BddClients.all();
+
+		/*génération du tableau*/
+		String col[] = {"Id","Nom","Prenom", "Adresse", "CodePostal", "Ville"};
+		DefaultTableModel tableModel = new DefaultTableModel(col, 0);
+		final JTable table = new JTable(tableModel);
+		
+		for (Iterator<Client> iterator = clients.iterator(); iterator.hasNext();) {
+			Client client = iterator.next();
+
+			String Id = client.getId();
+			String Nom = client.getNom();
+			String Prenom = client.getPrenom();
+			String Adresse = client.getAdresse();
+			String CodePostal = client.getCodePostal();
+			String Ville = client.getVille();
+
+			Object[] data = {Id,Nom,Prenom,Adresse,CodePostal,Ville};
+
+			tableModel.addRow(data);
+		}
+
+		JScrollPane scrollPane = new JScrollPane(table);
+		
+		
+		/*Création de l'évènement d'affichage de la liste des informations du client au clic du client*/
+		table.setCellSelectionEnabled(true);
+		ListSelectionModel cellSelectionModel = table.getSelectionModel();
+		cellSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
+		cellSelectionModel.addListSelectionListener(new ListSelectionListener() {
+			
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				String selectedClient = null;
+				int[] selectedRows = table.getSelectedRows();
+				
+				for (int i = 0; i < selectedRows.length; i++) {
+					
+					selectedClient = (String) table.getValueAt(selectedRows[i], 0);/*0 correspond à l'id*/
+					}
+		        System.out.println("Selected: " + selectedClient);
+		      }
+
+		    });
+
+		System.out.println(Config.getConfig());
+		
+		frame.add(scrollPane);
+		
+
+	   
+	}
+}

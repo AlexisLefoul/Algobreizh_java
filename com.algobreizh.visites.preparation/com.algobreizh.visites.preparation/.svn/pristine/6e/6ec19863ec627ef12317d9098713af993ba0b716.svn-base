@@ -1,0 +1,215 @@
+package com.algobreizh.visites.preparation.swing;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.HeadlessException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.sql.Date;
+import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.Properties;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.border.LineBorder;
+
+import org.jdatepicker.impl.JDatePanelImpl;
+import org.jdatepicker.impl.JDatePickerImpl;
+import org.jdatepicker.impl.SqlDateModel;
+import com.algobreizh.visites.preparation.core.lib.Client;
+import com.algobreizh.visites.preparation.core.lib.Commercial;
+import com.algobreizh.visites.preparation.core.lib.Rdv;
+import com.algobreizh.visites.preparation.data.BddClients;
+import com.algobreizh.visites.preparation.data.BddRDV;
+
+public class AjoutSwing extends JDialog {
+
+	private JTextField tfS;
+	private JDatePickerImpl jdP;
+	private JTextField tfL;
+	private JTextArea taC;
+	private JLabel lbS;
+	private JLabel lbD;
+	private JLabel lbL;
+	private JLabel lbC;
+	private JButton btnAjout;
+	private JButton btnCancel;
+	
+
+	public AjoutSwing(Frame parent) {
+		super(parent, "Nouveau Rendez-vous", true);
+
+		JPanel panel = new JPanel(new GridBagLayout());
+		GridBagConstraints cs = new GridBagConstraints();
+
+		cs.fill = GridBagConstraints.HORIZONTAL;
+
+		lbS = new JLabel("Semaine: ");
+		cs.gridx = 0;
+		cs.gridy = 0;
+		cs.gridwidth = 1;
+		panel.add(lbS, cs);
+
+		tfS = new JTextField(20);
+		cs.gridx = 1;
+		cs.gridy = 0;
+		cs.gridwidth = 2;
+		panel.add(tfS, cs);
+
+		lbD = new JLabel("Date: ");
+		cs.gridx = 0;
+		cs.gridy = 3;
+		cs.gridwidth = 1;
+		panel.add(lbD, cs);
+
+		jdP = setDatePicker();
+		cs.gridx = 1;
+		cs.gridy = 3;
+		cs.gridwidth = 2;
+		panel.add(jdP, cs);
+
+		lbL = new JLabel("Lieu: ");
+		cs.gridx = 0;
+		cs.gridy = 4;
+		cs.gridwidth = 1;
+		panel.add(lbL, cs);
+
+		tfL = new JTextField(20);
+		cs.gridx = 1;
+		cs.gridy = 4;
+		cs.gridwidth = 2;
+		panel.add(tfL, cs);
+
+		lbC = new JLabel("Commentaire: ");
+		cs.gridx = 0;
+		cs.gridy = 5;
+		cs.gridwidth = 1;
+		panel.add(lbC, cs);
+
+		taC = new JTextArea(10, 10);
+		taC.setLineWrap(true);
+		taC.setWrapStyleWord(true);
+		cs.gridx = 1;
+		cs.gridy = 5;
+		cs.gridwidth = 2;
+		panel.add(taC, cs);
+
+		panel.setBorder(new LineBorder(Color.BLUE));
+
+		btnAjout = new JButton("Ajouter");
+		btnAjout.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				
+					try {
+						
+						getNewRdv();
+					} catch (IOException | HeadlessException | SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				
+			}
+		});
+
+		btnCancel = new JButton("Cancel");
+		btnCancel.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+
+				dispose();
+			}
+		});
+		JPanel bp = new JPanel();
+		bp.add(btnAjout);
+		bp.add(btnCancel);
+
+		getContentPane().add(panel, BorderLayout.CENTER);
+		getContentPane().add(bp, BorderLayout.PAGE_END);
+
+		pack();
+		setResizable(false);
+
+		setLocationRelativeTo(parent);
+
+	}
+
+	public void getNewRdv() throws IOException, HeadlessException, SQLException {
+
+		//construit l'objet de nouveau rdv a parti de la saisit
+		
+		Date selectedDate = (Date) jdP.getModel().getValue();
+
+		for (Iterator<Client> iterator = BddClients.clients.values().iterator(); iterator
+				.hasNext();) {
+			Client client = iterator.next();
+
+			if (client.getId() == UiSwing.selectedContact) {
+				
+				Rdv rdv = new Rdv(0, Commercial.Id(), UiSwing.selectedContact,
+						Integer.parseInt(tfS.getText()), client.getNom(),
+						client.getPrenom(), selectedDate.toString(),
+						tfL.getText(), taC.getText());
+
+				setNewRdv(rdv);
+
+			}
+
+		}
+
+	}
+
+	public void setNewRdv(Rdv rdv) throws HeadlessException, IOException,
+			SQLException {
+
+		// ajout dans BDD et tablemodel
+
+		if (BddRDV.create(rdv)) {
+
+			Object[] dataRdv = { UiSwing.maxRows, rdv.getSemaine(),
+					rdv.getNom(), rdv.getPrenom(), rdv.getLieu(),
+					rdv.getCommentaire() };
+
+			UiSwing.tableModelrdvs.addRow(dataRdv);
+
+			JOptionPane.showMessageDialog(AjoutSwing.this,
+					"Rendez-vous enregistré ", "OK",
+					JOptionPane.INFORMATION_MESSAGE);
+			dispose();
+		} else {
+			JOptionPane.showMessageDialog(AjoutSwing.this,
+					"Un problème est survenu", "OK",
+					JOptionPane.INFORMATION_MESSAGE);
+			dispose();
+
+		}
+
+	}
+
+	public static JDatePickerImpl setDatePicker() {
+
+		SqlDateModel model = new SqlDateModel();
+		Properties p = new Properties();
+		p.put("text.today", "Today");
+		p.put("text.month", "Month");
+		p.put("text.year", "Year");
+		JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
+
+		JDatePickerImpl datePicker = new JDatePickerImpl(datePanel,
+				new DateLabelFormatter());
+
+		return datePicker;
+
+	}
+
+}

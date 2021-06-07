@@ -1,0 +1,41 @@
+package com.algobreizh.visites.preparation.core.lib;
+
+public class Rdv {
+	private int Id;
+	private int Semaine;
+	private String Nom;
+	private String Prenom;
+	private String Date;
+	private String Lieu;
+	private String IdCommercial;
+	
+	public Rdv(int Id, int Semaine, String Nom, String Prenom, 
+			String Date, String Lieu, String IdCommercial){
+		this.Id = Id;
+		this.Semaine = Semaine;
+		this.Nom = Nom;
+		this.Prenom = Prenom;
+		this.Date = Date;
+		this.Lieu = Lieu;
+		this.IdCommercial = IdCommercial;
+	}
+	
+	/*Getters*/
+	public int getId(){ return Id;}
+	public int getSemaine(){ return Semaine;}
+	public String getNom(){ return Nom;}
+	public String getPrenom(){ return Prenom;}
+	public String getDate(){ return Date;}
+	public String getLieu(){return Lieu;}
+	public String getIdCommercial(){return IdCommercial;}
+	
+	/*Setters*/
+	public void setId(int Id) { this.Id = Id; }
+	public void setSemaine(int Semaine) { this.Semaine = Semaine; }
+	public void setNom(String Nom) { this.Nom = Nom; }
+	public void setPrenom(String Prenom) { this.Prenom = Prenom;}
+	public void setDate(String Date) { this.Date = Date;}
+	public void setLieu(String Lieu) { this.Lieu = Lieu;}
+	public void setIdCommercial(String IdCommercial){ this.IdCommercial = IdCommercial;}
+	
+}

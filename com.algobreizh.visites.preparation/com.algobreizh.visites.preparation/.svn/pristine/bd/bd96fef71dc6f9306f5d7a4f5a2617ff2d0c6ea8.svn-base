@@ -1,0 +1,119 @@
+package com.algobreizh.visites.preparation.data;
+
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+
+import com.algobreizh.visites.preparation.core.lib.Client;
+import com.algobreizh.visites.preparation.core.lib.Rdv;
+
+public class BddRDV {
+
+	public static void create(Rdv rdv) throws IOException {
+		String getMax = "SELECT Max(idRDV) AS `Max` FROM `Visites_RDV`;";
+		try {
+			ResultSet rs = BddAlgobreizh.statement().executeQuery(getMax);
+			rs.next();
+			int max = rs.getInt("Max");
+			max++;
+			String requete = "INSERT INTO `algobreizh_gestion`.`Visites_RDV` ("+
+					"`idRDV`, `Semaine`, `Nom`, `Prenom`, `Date`, `Lieu`, `idCommercial`)"+ 
+					"VALUES ('"+ max +"', '"+rdv.getSemaine()+"', '"+rdv.getNom()+"', '"+rdv.getPrenom()+"', '"+rdv.getDate()+"', '"+rdv.getLieu()+"', '"+rdv.getidCommercial()+"');";
+			rdv.setId(max);
+			BddAlgobreizh.statement().execute(requete);
+			System.out.println(requete);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public static Rdv read(int id) throws IOException {
+		Rdv rdv = null;
+		String requete = "SELECT * FROM `Visites_RDV` WHERE idRDV = " +id+";";
+		try {
+			ResultSet result = BddAlgobreizh.statement().executeQuery(requete);
+
+			if(result.next()) {
+
+				int IdRDV = result.getInt("IdRDV");
+				String idCommercial = result.getString("idCommercial");
+				int Semaine = result.getInt("Semaine");
+				String Nom = result.getString("Nom");
+				String Prenom =result.getString("Prenom");
+				String Date = result.getString("Date");
+				String Lieu = result.getString("Lieu");
+				
+
+				rdv = new Rdv(IdRDV, idCommercial, Semaine, Nom, Prenom, Date, Lieu);
+
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return rdv;
+		
+	}
+
+	public static void update (Rdv rdv) throws IOException {
+		try {
+			String requete = 
+					"UPDATE `algobreizh_gestion`.`visites_rdv` SET `Semaine` = '"+rdv.getSemaine()+
+					"', `Nom` = '"+rdv.getNom()+
+					"', `Prenom` = '"+rdv.getPrenom()+
+					"', `Date` = '"+rdv.getDate()+
+					"', `Lieu` = '"+rdv.getLieu()+
+					"', `IdCommercial` = '"+rdv.getidCommercial()+
+					"' WHERE `visites_rdv`.`id` = "+rdv.getId()+";";
+
+			BddAlgobreizh.statement().execute(requete);
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public static void delete(Rdv rdv) throws IOException{
+		String requete = "DELETE FROM `algobreizh_gestion`.`visites_rdv` WHERE `visites_rdv`.`idRDV` = "+rdv.getId()+";";
+		try {
+			BddAlgobreizh.statement().execute(requete);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	public static Collection<Rdv> all() throws IOException {
+		Collection<Rdv> rdvs = new ArrayList<Rdv>();
+
+		try {
+			String requete = "SELECT * FROM visites_rdv";
+			ResultSet result = BddAlgobreizh.statement().executeQuery(requete);
+
+			while(result.next()) {
+
+				int IdRDV = result.getInt("IdRDV");
+				String IdCommercial = result.getString("IdCommercial");
+				int Semaine = result.getInt("Semaine");
+				String Nom = result.getString("Nom");
+				String Prenom =result.getString("Prenom");
+				String Date = result.getString("Date");
+				String Lieu = result.getString("Lieu");
+				
+
+				Rdv rdv = new Rdv(IdRDV, IdCommercial,Semaine, Nom, Prenom, Date, Lieu);
+				rdvs.add(rdv);	
+				
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return rdvs;
+	}
+}

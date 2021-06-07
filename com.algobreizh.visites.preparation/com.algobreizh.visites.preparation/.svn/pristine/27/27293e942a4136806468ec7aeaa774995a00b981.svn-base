@@ -1,0 +1,209 @@
+package com.algobreizh.visites.preparation.swing;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.border.LineBorder;
+
+import com.algobreizh.visites.preparation.core.lib.Commercial;
+import com.algobreizh.visites.preparation.core.lib.Rdv;
+import com.algobreizh.visites.preparation.data.BddRDV;
+
+public class AjoutSwing extends JDialog {
+	
+	private JTextField tfS;
+    private JTextField tfN;
+    private JTextField tfP;
+    private JTextField tfD;
+    private JTextField tfL;
+    private JTextArea taC;
+    private JLabel lbS;
+    private JLabel lbN;
+    private JLabel lbP;
+    private JLabel lbD;
+    private JLabel lbL;
+    private JLabel lbC;
+    private JButton btnAjout;
+    private JButton btnCancel;
+    
+    public AjoutSwing(Frame parent) {
+        super(parent, "Nouveau Rendez-vous", true);
+        
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints cs = new GridBagConstraints();
+ 
+        cs.fill = GridBagConstraints.HORIZONTAL;
+ 
+        lbS = new JLabel("Semaine: ");
+        cs.gridx = 0;
+        cs.gridy = 0;
+        cs.gridwidth = 1;
+        panel.add(lbS, cs);
+        
+        tfS = new JTextField(20);
+        cs.gridx = 1;
+        cs.gridy = 0;
+        cs.gridwidth = 2;
+        panel.add(tfS, cs);
+ 
+        lbN = new JLabel("Nom: ");
+        cs.gridx = 0;
+        cs.gridy = 1;
+        cs.gridwidth = 1;
+        panel.add(lbN, cs);
+ 
+        tfN = new JTextField(20);
+        cs.gridx = 1;
+        cs.gridy = 1;
+        cs.gridwidth = 2;
+        panel.add(tfN, cs);
+        
+        lbP = new JLabel("Prenom: ");
+        cs.gridx = 0;
+        cs.gridy = 2;
+        cs.gridwidth = 1;
+        panel.add(lbP, cs);
+        
+        tfP = new JTextField(20);
+        cs.gridx = 1;
+        cs.gridy = 2;
+        cs.gridwidth = 2;
+        panel.add(tfP, cs);
+         
+        lbD = new JLabel("Date: ");
+        cs.gridx = 0;
+        cs.gridy = 3;
+        cs.gridwidth = 1;
+        panel.add(lbD, cs);
+        
+        tfD = new JTextField(20);
+        cs.gridx = 1;
+        cs.gridy = 3;
+        cs.gridwidth = 2;
+        panel.add(tfD, cs);
+        
+        lbL = new JLabel("Lieu: ");
+        cs.gridx = 0;
+        cs.gridy = 4;
+        cs.gridwidth = 1;
+        panel.add(lbL, cs);
+        
+        tfL = new JTextField(20);
+        cs.gridx = 1;
+        cs.gridy = 4;
+        cs.gridwidth = 2;
+        panel.add(tfL, cs);
+        
+        lbC = new JLabel("Commentaire: ");
+        cs.gridx = 0;
+        cs.gridy = 5;
+        cs.gridwidth = 1;
+        panel.add(lbC, cs);
+        
+        taC = new JTextArea(20, 20);
+        taC.setLineWrap(true);
+        taC.setWrapStyleWord(true);
+        cs.gridx = 1;
+        cs.gridy = 5;
+        cs.gridwidth = 2;
+        panel.add(taC, cs);
+        
+        panel.setBorder(new LineBorder(Color.GRAY));
+ 
+        btnAjout = new JButton("Ajouter");
+        btnAjout.addActionListener(new ActionListener() {
+ 
+            public void actionPerformed(ActionEvent e) {
+            	
+            	try {
+					getNewRdv();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+            }
+        });
+       
+        btnCancel = new JButton("Cancel");
+        btnCancel.addActionListener(new ActionListener() {
+ 
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
+        });
+        JPanel bp = new JPanel();
+        bp.add(btnAjout);
+        bp.add(btnCancel);
+ 
+        getContentPane().add(panel, BorderLayout.CENTER);
+        getContentPane().add(bp, BorderLayout.PAGE_END);
+ 
+        pack();
+        setResizable(false);
+        
+        setLocationRelativeTo(parent);
+       
+	 	 
+    }
+ 
+    public void  getNewRdv() throws IOException {
+    	
+    	Rdv rdv = new Rdv(
+    			-1,
+    			Commercial.Id(),
+    			Integer.parseInt(tfS.getText()),
+    			tfN.getText(),
+    			tfP.getText(),
+    			tfD.getText(),
+    			tfL.getText(),
+    			taC.getText()
+    			);
+   
+    	//ajout dans BDD et tablemodel
+    	
+    	if(BddRDV.create(rdv)){
+    	
+    	Object[] dataRdv = {
+    			UiSwing.maxRows,
+    			tfS.getText(),
+    			tfN.getText(),
+    			tfP.getText(),
+    			tfD.getText(),
+    			tfL.getText(),
+    			taC.getText()};
+    		
+    	UiSwing.tableModelrdvs.addRow(dataRdv);	
+    		
+    	 JOptionPane.showMessageDialog(AjoutSwing.this,
+		            "Rendez-vous enregistré ",
+		            "OK",
+		            JOptionPane.INFORMATION_MESSAGE);
+		    dispose();
+    	}
+		    else{
+		    	JOptionPane.showMessageDialog(AjoutSwing.this,
+			            "Un problème est survenu",
+			            "OK",
+			            JOptionPane.INFORMATION_MESSAGE);
+			    dispose();
+		    	
+		    	
+		    }
+    
+    }
+
+}

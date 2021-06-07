@@ -1,0 +1,45 @@
+package com.algobreizh.visites.preparation.data;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import com.algobreizh.visites.preparation.core.lib.Outils;
+
+public class BddAlgobreizh {
+	
+
+	/* Méthode de connexion à la bdd */
+	public static Statement statement() throws SQLException {
+		Connection connexion = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/algobreizh_gestion?user=root&password=");
+
+		return connexion.createStatement();
+	}
+
+	public static boolean authentification(String username, String password) throws SQLException {
+		
+		String requete = "SELECT * FROM identification";
+		ResultSet result = statement().executeQuery(requete);
+		
+		
+		
+		while(result.next())	
+		{
+			//String test = result.getNString(columnLabel)
+			String login = result.getString("Contact_Name");
+			String pass =result.getString("Password");
+			
+			System.out.println(login+pass);
+			
+			System.out.println(Outils.PasswordToHash(password));
+		
+			if (username.equals(login) && Outils.PasswordToHash(password).equals(pass)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+}

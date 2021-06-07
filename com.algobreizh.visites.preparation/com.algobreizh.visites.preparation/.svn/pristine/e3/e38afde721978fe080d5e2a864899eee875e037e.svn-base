@@ -1,0 +1,29 @@
+/*Creation de la table Visites_RDV*/
+CREATE TABLE `Visites_RDV` (
+  `idCommercial` INT NOT NULL AUTO_INCREMENT,
+  `Semaine` INT NOT NULL,
+  `Nom` VARCHAR(45) NOT NULL,
+  `Prenom` VARCHAR(45) NOT NULL,
+  `Date` DATETIME NOT NULL,
+  `Lieu` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`idCommercial`),
+  UNIQUE INDEX `id_UNIQUE` (`idCommercial` ASC))
+ENGINE = InnoDB;
+
+/*Creation de la table visites_login*/
+CREATE TABLE `visites_login` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `IdCommercial` INT NOT NULL,
+  `login` VARCHAR(45),
+  `mdp` VARCHAR(128),
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC),
+  FOREIGN KEY (`IdCommercial`) REFERENCES visites_rdv(`IdCommercial`))
+ENGINE = InnoDB;
+
+/*Création de la table identification*/
+CREATE TABLE IF NOT EXISTS identification AS SELECT
+	Id,Contact_Name FROM colleague;
+ALTER TABLE identification
+    ADD Password VARCHAR(128),
+    PRIMARY KEY (`Id`);
