@@ -181,22 +181,29 @@ public class UiSwing extends JFrame {
 
 		if (selectedRDV != 0) {
 
-			Rdv currentRdv = BddRDV.rdvs.get(selectedRDV);
+			Rdv currentRdv;
+			try {
+				currentRdv = BddRDV.all().get(selectedRDV);
 
-			
-			UpdDialog.tfL.setText(currentRdv.getLieu());
-			UpdDialog.taC.setText(currentRdv.getCommentaire());
+				
+				UpdDialog.tfL.setText(currentRdv.getLieu());
+				UpdDialog.taC.setText(currentRdv.getCommentaire());
 
-			String[] dateStrings = currentRdv.getDate().split("-| ");
+				String[] dateStrings = currentRdv.getDate().split("-| ");
 
-			int year = Integer.parseInt(dateStrings[0]);
-			int month = Integer.parseInt(dateStrings[1]);
-			int day = Integer.parseInt(dateStrings[2]);
+				int year = Integer.parseInt(dateStrings[0]);
+				int month = Integer.parseInt(dateStrings[1]);
+				int day = Integer.parseInt(dateStrings[2]);
 
-			UpdDialog.jdP.getModel().setDate(year, month, day);
-			UpdDialog.setVisible(true);
+				UpdDialog.jdP.getModel().setDate(year, month, day);
+				UpdDialog.setVisible(true);
 
-			System.out.println(year + "//" + month + "//" + day);
+				System.out.println(year + "//" + month + "//" + day);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 		} else {
 			advertSelected(UpdDialog);
 		}

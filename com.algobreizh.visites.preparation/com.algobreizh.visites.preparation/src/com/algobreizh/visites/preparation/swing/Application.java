@@ -38,7 +38,8 @@ public class Application {
 					
 					btnLogin.setVisible(false);
 				
-					picLabel.setVisible(false);
+					//picLabel.setVisible(false);
+					
 					// on affiche l'interface
 
 					try {
@@ -61,7 +62,7 @@ public class Application {
 		BufferedImage myPicture;
 		try {
 			myPicture = ImageIO
-					.read(new File("donnees/img/AlgoBreizh_Logo.png"));
+					.read(new File("C:\\Users\\LEFOUL\\OneDrive\\Documents\\Cours\\E4 & E6\\Java\\Algobreizh_java\\com.algobreizh.visites.preparation\\com.algobreizh.visites.preparation\\donnees\\img\\AlgoBreizh_Logo.png"));
 			 picLabel = new JLabel(new ImageIcon(myPicture));
 			frame.add(picLabel);
 
